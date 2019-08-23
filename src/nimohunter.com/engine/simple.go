@@ -13,24 +13,28 @@ func (e *SimpleEngine) Run(seeds ...model.Request) {
 
 	inChannel := make(chan model.Request, 1e4)
 	outChannel := make(chan model.ParseResult, 1e4)
-	for i := 0; i < e.WorkCount; i++ {
-		go createWorker(inChannel, outChannel)
-	}
+	startSignal := make(chan int)
 
-	var requests []model.Request
 	for _, r := range seeds {
 		inChannel <- r
 	}
 
+	for i := 0; i < e.WorkCount; i++ {
+		go createWorker(startSignal, inChannel, outChannel)
+	}
 
-	for  {
+	close(startSignal)
+
+	for {
 		select {
-		case result, ok := <- outChannel:
+		case result, ok := <-outChannel:
 			if ok == false {
 				break
 			}
 
-			requests = append(requests, result.Requests...)
+			for _, request := range result.Requests {
+				inChannel <- request
+			}
 
 			for _, item := range result.Items {
 				log.Printf("Got item %v", item)
@@ -39,5 +43,3 @@ func (e *SimpleEngine) Run(seeds ...model.Request) {
 
 	}
 }
-
-

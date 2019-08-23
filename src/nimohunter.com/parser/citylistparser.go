@@ -22,20 +22,20 @@ func ParseCityList(contents []byte) model.ParseResult {
 		if _, ok := uniqueMap[string(c[2])]; !ok {
 			item := model.Item{
 				// TODO fill the item
-				Url: string(c[1]),
+				Url:  string(c[1]),
 				Type: "cityList",
 			}
 			//print city name
-			fmt.Printf("city: %s", string(c[2]) )
+			fmt.Printf("city: %s  url: %s\n", string(c[2]), string(c[1]))
 			result.Items = append(result.Items, item)
 
 			result.Requests = append(result.Requests, model.Request{
-				Url:        string(c[1]),
-				ParseMethod: model.CityListParse,
+				Url:         string(c[1]),
+				ParseMethod: model.CityParse,
 			})
 			//FIXME just run 2 city
 			i++
-			if i > 2 {
+			if i > 1 {
 				break
 			}
 			uniqueMap[string(c[2])] = true
@@ -45,7 +45,3 @@ func ParseCityList(contents []byte) model.ParseResult {
 
 	return result
 }
-
-
-
-

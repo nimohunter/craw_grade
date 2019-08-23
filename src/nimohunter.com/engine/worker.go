@@ -16,7 +16,6 @@ func doWork(r model.Request) (model.ParseResult, error) {
 		return model.ParseResult{}, err
 	}
 
-	GetParseFunc(r.ParseMethod)
 	return GetParseFunc(r.ParseMethod)(body), nil
 }
 
@@ -26,16 +25,25 @@ func GetParseFunc(parseMethod model.ParseType) func(bytes []byte) model.ParseRes
 		return func(bytes []byte) model.ParseResult {
 			return parser.ParseCityList(bytes)
 		}
+	case model.CityParse:
+		return func(bytes []byte) model.ParseResult {
+			return parser.CityParser(bytes)
+		}
+
 	}
 	//TODO ADD other method
 	return nil
 }
 
-func createWorker(in chan model.Request, out chan model.ParseResult) {
-	request := <- in
-
-	result, err := doWork(request)
-	if err != nil {
-		go func() {out <- result}()
+func createWorker(startSignal chan int, in chan model.Request, out chan model.ParseResult) {
+	<-startSignal
+	for {
+		select {
+		case request := <-in:
+			result, err := doWork(request)
+			if err == nil {
+				go func() { out <- result }()
+			}
+		}
 	}
 }
