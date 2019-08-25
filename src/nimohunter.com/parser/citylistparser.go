@@ -21,7 +21,6 @@ func ParseCityList(contents []byte) model.ParseResult {
 	for _, c := range all {
 		if _, ok := uniqueMap[string(c[2])]; !ok {
 			item := model.Item{
-				// TODO fill the item
 				Url:  string(c[1]),
 				Type: "cityList",
 			}

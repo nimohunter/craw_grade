@@ -29,9 +29,11 @@ func GetParseFunc(parseMethod model.ParseType) func(bytes []byte) model.ParseRes
 		return func(bytes []byte) model.ParseResult {
 			return parser.CityParser(bytes)
 		}
-
+	case model.ProfileParse:
+		return func(bytes []byte) model.ParseResult {
+			return parser.ProfileParser(bytes)
+		}
 	}
-	//TODO ADD other method
 	return nil
 }
 

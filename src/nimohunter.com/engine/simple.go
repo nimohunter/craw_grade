@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"log"
 	"nimohunter.com/model"
 )
 
@@ -34,10 +33,6 @@ func (e *SimpleEngine) Run(seeds ...model.Request) {
 
 			for _, request := range result.Requests {
 				inChannel <- request
-			}
-
-			for _, item := range result.Items {
-				log.Printf("Got item %v", item)
 			}
 		}
 
