@@ -9,13 +9,16 @@ import (
 	"golang.org/x/text/transform"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 func Post(url string, params url.Values) ([]byte, error) {
 	request, _ := http.NewRequest(http.MethodPost, url, strings.NewReader(params.Encode()))
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
 	resp, err := invoke(request)
 	if err != nil {
 		return nil, err
@@ -56,7 +59,19 @@ func Fetch(url string) ([]byte, error) {
 func invoke(request *http.Request) (*http.Response, error) {
 	request.Header.Add("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1")
 
-	resp, err := http.DefaultClient.Do(request)
+	netTransport := &http.Transport{
+		DialContext: (&net.Dialer{
+			Timeout:   5 * time.Second,
+			KeepAlive: 5 * time.Second,
+		}).DialContext,
+		TLSHandshakeTimeout: 5 * time.Second,
+	}
+
+	netClient := &http.Client{
+		Timeout:   10 * time.Second,
+		Transport: netTransport,
+	}
+	resp, err := netClient.Do(request)
 
 	if resp == nil {
 		fmt.Println("resp:", resp)

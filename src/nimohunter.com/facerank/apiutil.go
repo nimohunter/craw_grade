@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/base64"
 	"fmt"
+	"github.com/bitly/go-simplejson"
 	"net/url"
 	"nimohunter.com/fetcher"
 	"sort"
@@ -14,25 +15,44 @@ import (
 
 const AppID = "2121104776"
 const AppKey = "Sn3VRV4281fIV6WZ"
-const url_preffix = "https://api.ai.qq.com/fcgi-bin/face/face_detectface"
+const TencentApiUrl = "https://api.ai.qq.com/fcgi-bin/face/face_detectface"
 
 func GetFaceRank(photoUrl string) int {
-
-	photoBase64 := getPhotoBase64(photoUrl)
-	if len(photoBase64) == 0 {
+	photo, err := fetcher.FetchRaw(photoUrl)
+	if err != nil {
 		return 0
 	}
-	params := getReqParams(photoBase64)
-	resultBytes, e := fetcher.Post(url_preffix, params)
+	photoBase64 := base64.StdEncoding.EncodeToString(photo)
+	params := generateReqParams(photoBase64)
+	resultBytes, e := fetcher.Post(TencentApiUrl, params)
 	if e != nil {
 		return 0
 	}
+	return getBeautyFromResultBytes(resultBytes)
+}
 
-	fmt.Println(string(resultBytes))
+func getBeautyFromResultBytes(bytes []byte) int {
+	res, err := simplejson.NewJson(bytes)
+	if err != nil {
+		return 0
+	}
+	ret, err := res.Get("ret").Int()
+	if ret != 0 {
+		return 0
+	}
+
+	array, err := res.Get("data").Get("face_list").Array()
+	if err == nil {
+		for i := range array {
+			face := res.Get("data").Get("face_list").GetIndex(i)
+			faceBeautyValue, _ := face.Get("beauty").Int()
+			return faceBeautyValue
+		}
+	}
 	return 0
 }
 
-func getReqParams(photoBase64 string) url.Values {
+func generateReqParams(photoBase64 string) url.Values {
 	params := url.Values{}
 	params.Set("app_id", AppID)
 	params.Set("app_key", AppKey)
@@ -70,13 +90,4 @@ func getSortedKeys(values url.Values) []string {
 	}
 	sort.Strings(keys)
 	return keys
-}
-
-func getPhotoBase64(photoUrl string) string {
-	photo, err := fetcher.FetchRaw(photoUrl)
-	if err != nil {
-		return ""
-	}
-	photoBase64 := base64.StdEncoding.EncodeToString(photo)
-	return photoBase64
 }
