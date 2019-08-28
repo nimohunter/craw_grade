@@ -20,13 +20,9 @@ func ParseCityList(contents []byte) model.ParseResult {
 	i := 0
 	for _, c := range all {
 		if _, ok := uniqueMap[string(c[2])]; !ok {
-			item := model.Item{
-				Url:  string(c[1]),
-				Type: "cityList",
-			}
+
 			//print city name
 			fmt.Printf("city: %s  url: %s\n", string(c[2]), string(c[1]))
-			result.Items = append(result.Items, item)
 
 			result.Requests = append(result.Requests, model.Request{
 				Url:         string(c[1]),

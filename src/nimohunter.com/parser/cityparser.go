@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"nimohunter.com/model"
 	"regexp"
 )
@@ -17,9 +16,6 @@ func CityParser(contents []byte) model.ParseResult {
 
 	for _, c := range all {
 		url := string(c[1])
-		name := string(c[2])
-		// FIXME remove
-		fmt.Println(name)
 		result.Requests = append(result.Requests, model.Request{
 			Url:         url,
 			ParseMethod: model.ProfileParse,

@@ -7,7 +7,7 @@ import (
 	"nimohunter.com/parser"
 )
 
-func doWork(r model.Request) (model.ParseResult, error) {
+func crawlWeb(r model.Request) (model.ParseResult, error) {
 
 	body, err := fetcher.Fetch(r.Url)
 
@@ -42,7 +42,7 @@ func createWorker(startSignal chan int, in chan model.Request, out chan model.Pa
 	for {
 		select {
 		case request := <-in:
-			result, err := doWork(request)
+			result, err := crawlWeb(request)
 			if err == nil {
 				go func() { out <- result }()
 			}

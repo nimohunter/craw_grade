@@ -2,7 +2,6 @@ package parser
 
 import (
 	"errors"
-	"fmt"
 	"github.com/bitly/go-simplejson"
 	"nimohunter.com/model"
 	"regexp"
@@ -18,37 +17,31 @@ func ProfileParser(context []byte) model.ParseResult {
 
 	if len(match) >= 2 {
 		json := match[1]
-		profile, e := parseJson(json)
+		item, e := parseJson(json)
 		if e != nil {
 			return result
 		}
-		result.Items = append(result.Items, model.Item{
-			Type:    "profile",
-			Id:      profile.Id,
-			Payload: profile,
-		})
-		println(profile.Name)
+		result.Items = append(result.Items, item)
 	}
 	return result
 
 }
 
 //解析json数据
-func parseJson(json []byte) (model.Profile, error) {
+func parseJson(json []byte) (model.Item, error) {
 	res, err := simplejson.NewJson(json)
 	if err != nil {
-		return model.Profile{}, errors.New("Json parse error")
+		return model.Item{}, errors.New("Json parse error")
 	}
-	var profile model.Profile
+	var profile model.Item
 
 	fillBasicInfo(&profile, res)
 	fillDetailInfo(&profile, res)
 	fillOtherInfo(&profile, res)
-	fmt.Printf("%+v\n", profile)
 	return profile, nil
 }
 
-func fillOtherInfo(profile *model.Profile, res *simplejson.Json) {
+func fillOtherInfo(profile *model.Item, res *simplejson.Json) {
 	name, err := res.Get("objectInfo").Get("nickname").String()
 	if err == nil {
 		profile.Name = name
@@ -74,7 +67,7 @@ func fillOtherInfo(profile *model.Profile, res *simplejson.Json) {
 
 }
 
-func fillDetailInfo(profile *model.Profile, res *simplejson.Json) {
+func fillDetailInfo(profile *model.Item, res *simplejson.Json) {
 	infos2, err := res.Get("objectInfo").Get("detailInfo").Array()
 	if err != nil {
 		return
@@ -92,7 +85,7 @@ func fillDetailInfo(profile *model.Profile, res *simplejson.Json) {
 	}
 }
 
-func fillBasicInfo(profile *model.Profile, res *simplejson.Json) {
+func fillBasicInfo(profile *model.Item, res *simplejson.Json) {
 	infos, err := res.Get("objectInfo").Get("basicInfo").Array()
 	if err != nil {
 		return
