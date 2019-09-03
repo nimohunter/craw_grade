@@ -5,6 +5,7 @@ import (
 	"github.com/bitly/go-simplejson"
 	"nimohunter.com/model"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -49,7 +50,11 @@ func fillOtherInfo(profile *model.Item, res *simplejson.Json) {
 
 	gender, err := res.Get("objectInfo").Get("genderString").String()
 	if err == nil {
-		profile.Gender = gender
+		if strings.Contains(gender, "男") {
+			profile.Gender = false
+		} else {
+			profile.Gender = true
+		}
 	}
 
 	id, err := res.Get("objectInfo").Get("memberID").String()
@@ -96,7 +101,12 @@ func fillBasicInfo(profile *model.Item, res *simplejson.Json) {
 			if strings.Contains(e, "未婚") || strings.Contains(e, "离异") || strings.Contains(e, "丧偶") {
 				profile.Marriage = e
 			} else if strings.Contains(e, "岁") {
-				profile.Age = e
+				pos := strings.Index(e, "岁")
+				age, err := strconv.Atoi(e[:pos])
+				if err != nil {
+					age = 0
+				}
+				profile.Age = age
 			} else if strings.Contains(e, "座") {
 				profile.Xingzuo = e
 			} else if strings.Contains(e, "cm") {

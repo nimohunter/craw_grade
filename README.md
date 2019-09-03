@@ -6,5 +6,7 @@ Try to craw zhenai and grade the photo.
 - [X] 1.simple crawl
 - [X] 2.face detect and get grade
 - [X] 3.save into elastic search
-- [ ] 4.generate the front-end for search (iris)
+- [X] 4.generate the front-end for search 
+- [ ] 5.because of the website anti-spider, so limit the distributed spider to single thread..
+
 

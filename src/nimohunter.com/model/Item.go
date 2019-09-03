@@ -3,8 +3,8 @@ package model
 type Item struct {
 	Name       string //姓名
 	Marriage   string //婚况
-	Age        string //年龄
-	Gender     string //性别
+	Age        int    //年龄
+	Gender     bool
 	Height     string //身高
 	Weight     string //体重
 	Income     string //收入

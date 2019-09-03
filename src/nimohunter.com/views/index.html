@@ -7,8 +7,21 @@
     <title></title>
 </head>
 <body>
-  <h1>{{.message}}</h1>
-  <div id="app">Hello Go</div>
+<div id="demo">
+    <div align="middle">
+        <img src="img/logo.jpeg" width="600" >
+        <form method="post" action="/search">
+            beauty:<input type="text" name="beauty">
+            Age:<input type="text" name="age">
+            Gender:<select name="gender">
+                <option value="男">男</option>
+                <option value="女">女</option>
+            </select>
+{{/*            <input type="text" maxlength="100" style="width: 400px; height: 25px" name="q">*/}}
+            <button type="submit" style="height: 30px">Search</button>
+        </form>
+    </div>
+</div>
 </body>
 </html>
   
